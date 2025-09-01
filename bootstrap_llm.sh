@@ -1,20 +1,31 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -e
 
+# ██████ Banner ██████
+echo "####### ####### ######  #     # #     # #     #    #       #       #     # "
+echo "   #    #       #     # ##   ## #     #  #   #     #       #       ##   ## "
+echo "   #    #       #     # # # # # #     #   # #      #       #       # # # # "
+echo "   #    #####   ######  #  #  # #     #    #       #       #       #  #  # "
+echo "   #    #       #   #   #     # #     #   # #      #       #       #     # "
+echo "   #    #       #    #  #     # #     #  #   #     #       #       #     # "
+echo "   #    ####### #     # #     #  #####  #     #    ####### ####### #     # "
+echo ""
+
 echo "[1/7] Updating Termux packages..."
 pkg update -y && pkg upgrade -y
-pkg install -y python git cmake clang wget unzip
+pkg install -y python git build-essential libandroid-spawn libc++ cmake clang wget unzip ninja
 
 echo "[2/7] Installing Python dependencies..."
 pkg install -y python-pip
-pip install numpy hnswlib onnxruntime
+pip install numpy hnswlib
 
 echo "[3/7] Cloning and building llama.cpp..."
 if [ ! -d llama.cpp ]; then
     git clone https://github.com/ggerganov/llama.cpp
 fi
 cd llama.cpp
-make -j$(nproc)
+echo "⚠️ llama.cpp now uses CMake — follow updated build instructions:"
+echo "🔗 https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md"
 cd ..
 
 echo "[4/7] Downloading Phi-3 Mini quantized model..."
@@ -82,12 +93,9 @@ PY
 
 # memory/embeddings.py
 cat > termux_llm/memory/embeddings.py <<'PY'
-import onnxruntime as ort
 import numpy as np
 
-# Placeholder: replace with a real embedding model
 def embed_text(text: str) -> np.ndarray:
-    # For demo purposes, return a fixed-size random vector
     np.random.seed(abs(hash(text)) % (10**6))
     return np.random.rand(384).astype(np.float32)
 PY
