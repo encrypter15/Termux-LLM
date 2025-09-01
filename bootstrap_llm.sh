@@ -6,7 +6,7 @@ pkg update -y && pkg upgrade -y
 pkg install -y python git cmake clang wget unzip
 
 echo "[2/7] Installing Python dependencies..."
-pip install --upgrade pip
+pkg install -y python-pip
 pip install numpy hnswlib onnxruntime
 
 echo "[3/7] Cloning and building llama.cpp..."
